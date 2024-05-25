@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
+using System.Net;
 
 namespace CarRent.Controllers
 {
@@ -185,5 +187,122 @@ namespace CarRent.Controllers
             return View(rentedCars);
         }
 
+        // Şifre sıfırlama sayfasını göster
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user != null)
+                {
+                    // Şifre sıfırlama token'i oluşturma
+                    var token = Guid.NewGuid().ToString();
+
+                    // Token'in son kullanma tarihini belirleme (örneğin, 1 saat)
+                    var tokenExpiry = DateTime.UtcNow.AddHours(1);
+
+                    // Veritabanına token'i ve son kullanma tarihini kaydetme
+                    user.ResetPasswordToken = token;
+                    user.ResetPasswordTokenExpiry = tokenExpiry;
+                    _context.Entry(user).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+
+                    // Şifre sıfırlama bağlantısı
+                    var resetLink = Url.Action("ResetPassword", "Account", new { email = user.Email, token }, protocol: HttpContext.Request.Scheme);
+
+                    // E-posta gönderme
+                    var fromAddress = new MailAddress("carvillarent@gmail.com", "Carvilla12");
+                    var toAddress = new MailAddress(email, user.Name);
+                    const string fromPassword = "rtcb nuum hygn vwnf"; // Gmail hesabınızın şifresi
+                    const string subject = "Şifre Sıfırlama";
+                    string body = $"Merhaba {user.Name},\n\nŞifrenizi sıfırlamak için aşağıdaki bağlantıyı kullanabilirsiniz:\n{resetLink}";
+
+                    using (var smtpClient = new SmtpClient
+                    {
+                        Host = "smtp.gmail.com",
+                        Port = 587,
+                        EnableSsl = true,
+                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                        UseDefaultCredentials = false,
+                        Credentials = new NetworkCredential("carvillarent@gmail.com", "rtcb nuum hygn vwnf")
+                    })
+                    {
+                        using (var mailMessage = new MailMessage(fromAddress, toAddress)
+                        {
+                            Subject = subject,
+                            Body = body
+                        })
+                        {
+                            smtpClient.Send(mailMessage);
+                        }
+                    }
+
+                    TempData["Message"] = "<p class='alert alert-success'>Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.</p>";
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    TempData["Message"] = "<p class='alert alert-danger'>Bu e-posta adresi ile kayıtlı bir kullanıcı bulunamadı.</p>";
+                }
+            }
+            return View();
+
+        }
+        
+
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Token ve e-posta adresi boşsa veya null ise hata göster
+                if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Token))
+                {
+                    TempData["Message"] = "<p class='alert alert-danger'>Geçersiz token veya e-posta adresi.</p>";
+                    return RedirectToAction("Login");
+                }
+
+                // Kullanıcıyı e-posta adresine göre bul
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+                // Kullanıcıyı bulamazsak hata göster
+                if (user == null)
+                {
+                    TempData["Message"] = "<p class='alert alert-danger'>Kullanıcı bulunamadı.</p>";
+                    return RedirectToAction("Login");
+                }
+
+                // Token'in son kullanma tarihini kontrol et
+                if (user.ResetPasswordTokenExpiry < DateTime.UtcNow)
+                {
+                    TempData["Message"] = "<p class='alert alert-danger'>Şifre sıfırlama bağlantısının süresi doldu.</p>";
+                    return RedirectToAction("Login");
+                }
+
+                // Token'i kontrol et
+                if (user.ResetPasswordToken != model.Token)
+                {
+                    TempData["Message"] = "<p class='alert alert-danger'>Geçersiz şifre sıfırlama bağlantısı.</p>";
+                    return RedirectToAction("Login");
+                }
+
+                // Update the password in the database
+                user.Password = model.NewPassword; // Assuming you have a property named Password in your User entity
+                _context.Entry(user).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                TempData["Message"] = "<p class='alert alert-success'>Şifreniz başarıyla güncellendi.</p>";
+                return RedirectToAction("Login");
+            }
+            return View(model);
+        }
+
     }
 }
+    

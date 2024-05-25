@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240525181828_ResetPasswordEklendi")]
+    partial class ResetPasswordEklendi
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,14 +83,14 @@ namespace Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreateDate = new DateTime(2024, 5, 26, 0, 30, 42, 41, DateTimeKind.Local).AddTicks(710),
+                            CreateDate = new DateTime(2024, 5, 25, 21, 18, 26, 939, DateTimeKind.Local).AddTicks(8282),
                             Email = "Admin@gmail.com",
                             IsActive = true,
                             IsAdmin = true,
                             Name = "Kursat",
                             Password = "123",
                             Surname = "Emin",
-                            UserGuid = "543495be-9218-4993-8c36-6dc544f10675"
+                            UserGuid = "af9a6fca-e4d7-4791-833d-d146466f6ffa"
                         });
                 });
 
@@ -435,6 +438,7 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ResetPasswordToken")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ResetPasswordTokenExpiry")
