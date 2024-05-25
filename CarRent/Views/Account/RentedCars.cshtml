@@ -1,0 +1,32 @@
+﻿@model List<Entities.Order> // Specify the model type
+<br />
+<br />
+<br />
+<br />
+<br />
+<h2>Kiraladığım Araçlar</h2>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Araç</th>
+            <th>Marka</th>
+            <th>Kiralama Başlangıç Tarihi</th>
+            <th>Kiralama Bitiş Tarihi</th>
+            <!-- Add more columns as needed -->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.CarName</td> <!-- Display car name -->
+                <td>@(order.Car?.Brand?.Name ?? "Unknown")</td> <!-- Display brand name, handle nulls -->
+                <td>@order.RentStartDate.ToString("dd/MM/yyyy")</td> <!-- Display start date -->
+                <td>@order.RentEndDate.ToString("dd/MM/yyyy")</td> <!-- Display end date -->
+                <!-- Add more columns as needed -->
+            </tr>
+        }
+    </tbody>
+</table>
