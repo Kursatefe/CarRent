@@ -3,6 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Entities
 {
+    public enum OrderStatus
+    {
+        Beklemede,
+        Onaylandı,
+        Onaylanmadı
+    }
     public class Order : IEntity
     {
         public int Id { get; set; }
@@ -42,5 +48,7 @@ namespace Entities
 
         [Display(Name = "Marka")]
         public string CarName { get; set; } // Add this property
+       
+        public OrderStatus Status { get; set; }
     }
 }

@@ -26,6 +26,7 @@ namespace Data
         public virtual DbSet<Comment> Comments { get; set; }
 
 
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(@"server=(LocalDb)\MSSQLLocalDB; database=CarRent; integrated security=True; trustservercertificate=True;");

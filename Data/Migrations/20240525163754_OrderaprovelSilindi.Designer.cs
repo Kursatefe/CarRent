@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240525163754_OrderaprovelSilindi")]
+    partial class OrderaprovelSilindi
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,14 +83,14 @@ namespace Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreateDate = new DateTime(2024, 5, 25, 19, 43, 56, 780, DateTimeKind.Local).AddTicks(314),
+                            CreateDate = new DateTime(2024, 5, 25, 19, 37, 52, 67, DateTimeKind.Local).AddTicks(8106),
                             Email = "Admin@gmail.com",
                             IsActive = true,
                             IsAdmin = true,
                             Name = "Kursat",
                             Password = "123",
                             Surname = "Emin",
-                            UserGuid = "f9fbc122-fe78-47b1-8864-c6f45abb115d"
+                            UserGuid = "3269b39b-5147-4934-a1d0-ad9871e7996d"
                         });
                 });
 
@@ -323,6 +326,9 @@ namespace Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -340,9 +346,6 @@ namespace Data.Migrations
 
                     b.Property<DateTime>("RentStartDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<string>("Surname")
                         .IsRequired()

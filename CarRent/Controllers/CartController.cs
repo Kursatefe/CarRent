@@ -87,15 +87,15 @@ namespace CarRent.Controllers
                 Surname = user.Surname, // Populate with user's last name
                 Phone = user.Phone, // Populate with user's phone number
                 CreateDate = DateTime.Now,
-                 CarName = car.Brand != null ? $"{car.Brand.Name} {car.Name}" : car.Name, 
-
+                 CarName = car.Brand != null ? $"{car.Brand.Name} {car.Name}" : car.Name,
+                Status = OrderStatus.Beklemede
 
             };
 
             _dbContext.Orders.Add(order);
             await _dbContext.SaveChangesAsync();
 
-            ViewBag.Message = "Araç başarıyla kiralandı.";
+            
 
             return View("RentCarConfirmation");
         }

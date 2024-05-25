@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240525163052_OrderClassOnayEklendi")]
+    partial class OrderClassOnayEklendi
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,14 +83,14 @@ namespace Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreateDate = new DateTime(2024, 5, 25, 19, 43, 56, 780, DateTimeKind.Local).AddTicks(314),
+                            CreateDate = new DateTime(2024, 5, 25, 19, 30, 50, 642, DateTimeKind.Local).AddTicks(5307),
                             Email = "Admin@gmail.com",
                             IsActive = true,
                             IsAdmin = true,
                             Name = "Kursat",
                             Password = "123",
                             Surname = "Emin",
-                            UserGuid = "f9fbc122-fe78-47b1-8864-c6f45abb115d"
+                            UserGuid = "29653608-3c19-466e-aaaf-0b9cadcc5f04"
                         });
                 });
 
@@ -341,9 +344,6 @@ namespace Data.Migrations
                     b.Property<DateTime>("RentStartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -357,6 +357,31 @@ namespace Data.Migrations
                     b.HasIndex("CarId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Entities.OrderApproval", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ApprovalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.ToTable("OrderApproval");
                 });
 
             modelBuilder.Entity("Entities.Post", b =>
@@ -493,6 +518,15 @@ namespace Data.Migrations
                     b.Navigation("Car");
                 });
 
+            modelBuilder.Entity("Entities.OrderApproval", b =>
+                {
+                    b.HasOne("Entities.Order", null)
+                        .WithOne("Approval")
+                        .HasForeignKey("Entities.OrderApproval", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Entities.Post", b =>
                 {
                     b.HasOne("Entities.Category", "Category")
@@ -528,6 +562,12 @@ namespace Data.Migrations
                     b.Navigation("Cars");
 
                     b.Navigation("Posts");
+                });
+
+            modelBuilder.Entity("Entities.Order", b =>
+                {
+                    b.Navigation("Approval")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
